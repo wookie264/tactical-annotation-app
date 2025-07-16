@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {IsNotEmpty,IsString} from "class-validator"
 
 export class AnnotationDto {
@@ -20,3 +21,4 @@ export class AnnotationDto {
   @IsNotEmpty()
   videoId: string; // Id ObjectId de la vidéo
 }
+
