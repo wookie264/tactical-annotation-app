@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
 import { AnnotationController } from './annotation.controller';
 import { AnnotationService } from './annotation.service';

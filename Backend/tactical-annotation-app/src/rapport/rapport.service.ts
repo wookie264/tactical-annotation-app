@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { RapportDto } from 'src/annotation/dto/rapport.dto';
+import { RapportDto } from 'src/rapport/dto/rapport.dto';
 
 @Injectable()
 export class RapportService {

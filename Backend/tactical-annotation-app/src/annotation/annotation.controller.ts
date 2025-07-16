@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Body, Controller, Delete, Get, Param, Patch, Post, NotFoundException } from '@nestjs/common';
 import { AnnotationService } from './annotation.service';
 import { AnnotationDto } from './dto/annotation.dto';
