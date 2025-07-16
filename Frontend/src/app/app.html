@@ -1,0 +1,21 @@
+<!-- Analyse Tactique Football - Page principale -->
+<h1 class="titre-principal">Analyse Tactique Football</h1>
+<p class="sous-titre">Annotez vos séquences vidéo pour analyser les schémas tactiques</p>
+<div style="display: flex; flex-direction: column; gap: 32px; align-items: center; margin-top: 32px;">
+  <!-- Section Séquence Vidéo -->
+  <div style="background: #fff; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 32px; width: 100%; max-width: 400px; min-height: 420px; margin-bottom: 16px;">
+    <h2 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+      <span style="font-size: 1.5rem;">⏫</span> Séquence Vidéo
+    </h2>
+    <p style="color: #718096; margin-bottom: 16px;">Uploadez une séquence de 5-7 secondes maximum</p>
+    <!-- Composant d'upload vidéo -->
+    <app-video-upload></app-video-upload>
+  </div>
+  <!-- Section Annotation Tactique -->
+  <div style="background: #fff; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 32px; width: 100%; max-width: 400px; min-height: 420px;">
+    <h2 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 8px;">Annotation Tactique</h2>
+    <p style="color: #718096; margin-bottom: 16px;">Remplissez les informations d'analyse de la séquence</p>
+    <!-- Composant de formulaire d'annotation -->
+    <app-tactical-annotation-form></app-tactical-annotation-form>
+  </div>
+</div>

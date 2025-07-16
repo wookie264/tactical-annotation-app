@@ -1,0 +1,6 @@
+<label class="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg h-56 cursor-pointer hover:border-blue-400 transition-colors">
+  <input type="file" accept="video/*" class="hidden" (change)="onFileSelected($event)">
+  <span class="text-4xl mb-2">⏫</span>
+  <span class="text-gray-500">Cliquez pour sélectionner une vidéo</span>
+  <span *ngIf="fileName" class="mt-2 text-blue-600 font-medium">{{ fileName }}</span>
+</label>
