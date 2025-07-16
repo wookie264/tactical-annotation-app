@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AnnotationDto } from './dto/annotation.dto';
@@ -22,6 +23,7 @@ export class AnnotationService {
             },
         })
     }
+    
 
     async deleteAnnotation(id_sequence:AnnotationDto['id_sequence']){
         return await this.prisma.annotation.delete({

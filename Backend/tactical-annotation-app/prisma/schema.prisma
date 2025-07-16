@@ -35,7 +35,7 @@ model Annotation {
 
 model RapportAnalyse {
   id                  String   @id @default(auto()) @map("_id") @db.ObjectId
-  id_sequence         String
+  id_sequence         String   @unique
   prediction_ia       String
   confiance           Float
   annotation_humaine  String
