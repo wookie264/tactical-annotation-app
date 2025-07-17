@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+
+model Video {
+  id     String   @id @default(auto()) @map("_id") @db.ObjectId
+  path   String
+
+  annotationId String?   @unique @db.ObjectId 
+  annotation   Annotation? @relation(fields: [annotationId], references: [id])
+
+  rapports   RapportAnalyse[] @relation("VideoToRapport")
+}
+
+model Annotation {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  id_sequence     String
+  annotation      String
+  validateur      String
+  date_annotation DateTime
+  commentaire     String
+
+  video    Video?           @relation
+  rapports RapportAnalyse[] @relation("AnnotationToRapport")
+}
+
+model RapportAnalyse {
+  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+  id_sequence        String
+  prediction_ia      String
+  confiance          Float
+  annotation_humaine String
+  equipe             String
+  joueurs_detectes   Int[]
+  commentaire_expert String
+  validation         String
+
+  // Relations
+  videoId      String?  @db.ObjectId
+  annotationId String?  @db.ObjectId
+
+  video        Video?      @relation("VideoToRapport", fields: [videoId], references: [id])
+  annotation   Annotation? @relation("AnnotationToRapport", fields: [annotationId], references: [id])
+}
