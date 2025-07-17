@@ -46,7 +46,7 @@ async uploadByPath(@Body() body: { path: string }) {
 }
 
 
- @Get('')
+ @Get('displayAll')
 async findAll() {
   try {
     return await this.videoService.findAll();

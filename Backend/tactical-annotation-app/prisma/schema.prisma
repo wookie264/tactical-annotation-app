@@ -39,7 +39,6 @@ model Annotation {
 
 model RapportAnalyse {
   id                 String   @id @default(auto()) @map("_id") @db.ObjectId
-  id_sequence        String
   prediction_ia      String
   confiance          Float
   annotation_humaine String
@@ -48,10 +47,10 @@ model RapportAnalyse {
   commentaire_expert String
   validation         String
 
-  // Relations
-  videoId      String?  @db.ObjectId
-  annotationId String?  @db.ObjectId
+  videoId      String  @db.ObjectId
+  annotationId String? @db.ObjectId
 
-  video        Video?      @relation("VideoToRapport", fields: [videoId], references: [id])
+  video        Video      @relation("VideoToRapport", fields: [videoId], references: [id])
   annotation   Annotation? @relation("AnnotationToRapport", fields: [annotationId], references: [id])
 }
+
