@@ -45,12 +45,12 @@ export class VideoController {
 
   @Post('uploadVideo')
   @UseInterceptors(FileInterceptor('video'))
-  async uploadVideo(@UploadedFile() file: Express.Multer.File) {
+  async uploadVideo(@UploadedFile() file: any) {
     if (!file) {
       throw new BadRequestException('No video file uploaded');
     }
     
-    const video = await this.videoService.uploadVideo(file);
+    const video = await this.videoService.uploadVideo(file as { mimetype: string; size: number; originalname: string; buffer: Buffer });
     return { status: 'success', data: video };
   }
 

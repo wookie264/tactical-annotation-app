@@ -2,6 +2,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RapportDto } from 'src/rapport/dto/rapport.dto';
+import { UpdateRapportDto } from 'src/rapport/dto/update-rapport.dto';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
@@ -33,6 +34,29 @@ export class RapportService {
         id_sequence: id_sequence,
       },
     });
+  }
+
+  async updateRapport(id_sequence: RapportDto['id_sequence'], updateRapportDto: UpdateRapportDto) {
+    // Filter out undefined values
+    const updateData = Object.fromEntries(
+      Object.entries(updateRapportDto).filter(([, value]) => value !== undefined)
+    );
+    
+    try {
+      return await this.prisma.rapportAnalyse.update({
+        where: {
+          id_sequence: id_sequence,
+        },
+        data: updateData,
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new NotFoundException(`Rapport with id_sequence '${id_sequence}' not found`);
+        }
+      }
+      throw new BadRequestException('Failed to update rapport');
+    }
   }
 
   async deleteRapport(id_sequence: RapportDto['id_sequence']) {

@@ -1,7 +1,8 @@
 /* eslint-disable prettier/prettier */
-import { Body, Controller, Delete, Get, Param,  Post, NotFoundException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Patch, NotFoundException, UseGuards } from '@nestjs/common';
 import { RapportService } from './rapport.service';
 import { RapportDto } from './dto/rapport.dto';
+import { UpdateRapportDto } from './dto/update-rapport.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('rapport')
@@ -31,6 +32,18 @@ export class RapportController {
       throw new NotFoundException(`Rapport with id_sequence '${id_sequence}' not found`);
     }
     return rapport;
+  }
+
+  @Patch('updateRapport/:id_sequence')
+  async updateRapport(
+    @Param('id_sequence') id_sequence: string,
+    @Body() updateRapportDto: UpdateRapportDto,
+  ) {
+    const updatedRapport = await this.rapportService.updateRapport(id_sequence, updateRapportDto);
+    if (!updatedRapport) {
+      throw new NotFoundException(`Rapport with id_sequence '${id_sequence}' not found`);
+    }
+    return { status: 'success', data: updatedRapport };
   }
 
   @Delete('deleteRapport/:id_sequence')
