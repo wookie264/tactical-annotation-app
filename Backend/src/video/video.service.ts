@@ -123,9 +123,8 @@ export class VideoService {
       fs.mkdirSync(uploadsDir, { recursive: true });
     }
 
-    // Generate unique filename
-    const timestamp = Date.now();
-    const filename = `${timestamp}_${file.originalname}`;
+    // Generate filename using only the original name
+    const filename = file.originalname;
     const filePath = path.join(uploadsDir, filename);
 
     // Save file to disk
