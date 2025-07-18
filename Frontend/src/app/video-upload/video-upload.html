@@ -1,0 +1,26 @@
+<div class="video-upload-card">
+  <div class="video-upload-header">
+    <h2 class="video-upload-title">
+      <span class="video-upload-title-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" stroke="#222" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 48 48" style="vertical-align:middle;">
+          <path d="M24 32V12"/>
+          <path d="M16 20l8-8 8 8"/>
+          <path d="M8 36v2a2 2 0 0 0 2 2h28a2 2 0 0 0 2-2v-2"/>
+        </svg>
+      </span>
+      Séquence Vidéo
+    </h2>
+    <p class="video-upload-subtitle">Uploadez une séquence de 5-7 secondes maximum</p>
+  </div>
+  <label class="video-upload-dropzone">
+    <input type="file" accept="video/*" class="video-upload-input" (change)="onFileSelected($event)">
+    <span class="video-upload-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" stroke="#94a3b8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 48 48">
+        <path d="M24 32V12"/>
+        <path d="M16 20l8-8 8 8"/>
+        <path d="M8 36v2a2 2 0 0 0 2 2h28a2 2 0 0 0 2-2v-2"/>
+      </svg>
+    </span>
+    <span class="video-upload-text">Cliquez pour sélectionner une vidéo</span>
+  </label>
+</div>
