@@ -1,4 +1,4 @@
-/* eslint-disable prettier/prettier */
+
 import { Controller, Post, Body } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/auth.dto';
@@ -13,3 +13,6 @@ export class AuthController {
     return this.authService.login(user);
   }
 }
+
+export class AuthController {}
+

@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
@@ -27,3 +26,4 @@ export class AuthService {
     };
   }
 }
+
