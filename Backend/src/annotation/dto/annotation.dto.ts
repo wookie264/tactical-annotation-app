@@ -19,6 +19,14 @@ export class AnnotationDto {
 
   @IsString()
   @IsNotEmpty()
+  domicile: string;
+
+  @IsString()
+  @IsNotEmpty()
+  visiteuse: string;
+
+  @IsString()
+  @IsNotEmpty()
   videoId: string; // Id ObjectId de la vidéo
 }
 

@@ -16,5 +16,13 @@ export class UpdateAnnotationDto {
 
   @IsOptional()
   @IsString()
+  domicile?: string;
+
+  @IsOptional()
+  @IsString()
+  visiteuse?: string;
+
+  @IsOptional()
+  @IsString()
   videoId?: string;
 } 
