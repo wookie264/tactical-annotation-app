@@ -47,3 +47,9 @@ model RapportAnalyse {
   annotationId        String? @db.ObjectId
   annotation          Annotation? @relation(fields: [annotationId], references: [id])
 }
+
+model User {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  username    String  @unique
+  password String
+}

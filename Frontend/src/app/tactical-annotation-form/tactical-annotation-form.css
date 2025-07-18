@@ -1,0 +1,121 @@
+.tactical-annotation-card {
+  background: #fff;
+  border-radius: 12px;
+  border: 1.5px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  padding: 24px 20px 24px 20px;
+  width: 100%;
+  max-width: 500px;
+  margin: 8px auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.tactical-annotation-header {
+  margin-bottom: 18px;
+}
+.tactical-annotation-title {
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+.tactical-annotation-subtitle {
+  color: #6b7280;
+  margin-bottom: 26px;
+  font-size: 0.95rem;
+}
+
+.tactical-annotation-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.tactical-annotation-form .row {
+  display: flex;
+  gap: 18px;
+}
+.tactical-annotation-form .row > * {
+  flex: 1;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 2px;
+}
+.form-group label {
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+.tactical-annotation-form .row > .form-group {
+  flex: 1;
+}
+
+.tactical-annotation-form input,
+.tactical-annotation-form textarea {
+  border: 1px solid #d1d5db;
+  border-radius: 7px;
+  padding: 9px 12px;
+  font-size: 0.95rem;
+  background: #fafbfc;
+  transition: border 0.2s;
+}
+.tactical-annotation-form input:focus,
+.tactical-annotation-form textarea:focus {
+  border: 1.5px solid #111;
+  outline: none;
+  background: #fff;
+}
+.tactical-annotation-form textarea {
+  min-height: 60px;
+  resize: vertical;
+}
+.tactical-annotation-form button[type="submit"] {
+  width: 100%;
+  background: #111;
+  color: #fff;
+  padding: 10px 0;
+  border-radius: 7px;
+  font-weight: bold;
+  font-size: 1rem;
+  border: none;
+  margin-top: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.tactical-annotation-form button[type="submit"]:hover {
+  background: #222;
+}
+
+.main-layout {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 32px;
+  margin: 40px auto;
+  max-width: 1200px;
+  width: 100%;
+  padding: 0 16px;
+}
+
+@media (max-width: 900px) {
+  .main-layout {
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 600px) {
+  .tactical-annotation-card {
+    padding: 16px 6px 16px 6px;
+  }
+  .tactical-annotation-form .row {
+    flex-direction: column;
+    gap: 10px;
+  }
+}

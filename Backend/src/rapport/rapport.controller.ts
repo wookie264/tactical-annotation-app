@@ -1,41 +1,56 @@
 /* eslint-disable prettier/prettier */
-import { Body, Controller, Delete, Get, Param,  Post, NotFoundException } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Patch, NotFoundException, UseGuards } from '@nestjs/common';
 import { RapportService } from './rapport.service';
 import { RapportDto } from './dto/rapport.dto';
+import { UpdateRapportDto } from './dto/update-rapport.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
-@Controller('annotation')
+@Controller('rapport')
+@UseGuards(JwtAuthGuard)
 export class RapportController {
   constructor(private readonly rapportService: RapportService) {}
 
-  @Get()
-  async getAnnotations() {
+  @Get('getAllRapport')
+  async getRapports() {
     const rapports = await this.rapportService.getRapport();     
     if (!rapports) {
-    return { status: 'success', message: 'No annotation found', data: [] };
+    return { status: 'success', message: 'No rapport found', data: [] };
   }
     return { status: 'success', data: rapports };
   }
 
-  @Post()
-  async createAnnotation(@Body() rapport: RapportDto) {
+  @Post('createRapport')
+  async createRapport(@Body() rapport: RapportDto) {
     const createdRapport = await this.rapportService.createRapport(rapport);
     return { status: 'success', data: createdRapport };
   }
 
-  @Get(':id_sequence')
+  @Get('getRapportById/:id_sequence')
   async getRapportById(@Param('id_sequence') id_sequence: string) {
     const rapport = await this.rapportService.getRapportById(id_sequence);
     if (!rapport) {
-      throw new NotFoundException('Rapport not found');
+      throw new NotFoundException(`Rapport with id_sequence '${id_sequence}' not found`);
     }
     return rapport;
   }
 
-  @Delete(':id_sequence')
+  @Patch('updateRapport/:id_sequence')
+  async updateRapport(
+    @Param('id_sequence') id_sequence: string,
+    @Body() updateRapportDto: UpdateRapportDto,
+  ) {
+    const updatedRapport = await this.rapportService.updateRapport(id_sequence, updateRapportDto);
+    if (!updatedRapport) {
+      throw new NotFoundException(`Rapport with id_sequence '${id_sequence}' not found`);
+    }
+    return { status: 'success', data: updatedRapport };
+  }
+
+  @Delete('deleteRapport/:id_sequence')
   async deleteRapport(@Param('id_sequence') id_sequence: string) {
     const deleted = await this.rapportService.deleteRapport(id_sequence);
     if (!deleted) {
-      throw new NotFoundException('Annotation not found');
+      throw new NotFoundException(`Rapport with id_sequence '${id_sequence}' not found`);
     }
     return { status: 'success', data: 'deleted' };
   }
