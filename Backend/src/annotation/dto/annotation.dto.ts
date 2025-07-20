@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import {IsNotEmpty,IsString} from "class-validator"
+import {IsNotEmpty,IsString,IsOptional} from "class-validator"
 
 export class AnnotationDto {
   @IsString()
@@ -16,6 +16,14 @@ export class AnnotationDto {
 
   @IsString()
   commentaire: string;
+
+  @IsString()
+  @IsOptional()
+  domicile?: string;
+
+  @IsString()
+  @IsOptional()
+  visiteuse?: string;
 
   @IsString()
   @IsNotEmpty()
