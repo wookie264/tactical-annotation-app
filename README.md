@@ -151,6 +151,63 @@ PORT=3000
 
 The backend runs on `http://localhost:3000` by default. The frontend is configured to connect to this URL.
 
+## 👤 User Management
+
+### Creating Users
+
+The application includes a standalone script to create users. This script is located in the Backend directory.
+
+#### Using the Create User Script
+
+```bash
+# Navigate to backend directory
+cd Backend
+
+# Create a user with custom credentials
+npx ts-node create-user.ts <username> <password>
+
+# Example: Create user 'admin' with password 'admin123'
+npx ts-node create-user.ts admin admin123
+
+# Example: Create user 'coach' with password 'football2024'
+npx ts-node create-user.ts coach football2024
+```
+
+#### Script Features
+
+- **Password Hashing**: Passwords are automatically hashed using bcrypt
+- **Validation**: Script validates that both username and password are provided
+- **Database Integration**: Uses Prisma to create users in the database
+- **Error Handling**: Proper error messages and database disconnection
+
+#### Script Output
+
+```bash
+# Successful user creation
+User created: { id: '...', username: 'admin', password: 'hashed_password' }
+
+# Error - missing parameters
+Usage: ts-node create-user.ts <username> <password>
+
+# Error - user already exists
+Error: Unique constraint failed on the fields: (`username`)
+```
+
+#### Prerequisites
+
+Before running the script, ensure:
+1. **Database is running** and accessible
+2. **Prisma client is generated**: `npx prisma generate`
+3. **Environment variables** are set in `.env`
+4. **Dependencies are installed**: `npm install`
+
+#### Security Notes
+
+- **Strong Passwords**: Use strong, unique passwords for production
+- **Username Uniqueness**: Usernames must be unique in the database
+- **Password Hashing**: All passwords are automatically hashed
+- **Environment Security**: Keep your `.env` file secure and never commit it
+
 ## 📖 Usage
 
 ### 1. Authentication

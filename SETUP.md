@@ -76,11 +76,38 @@ docker run -d -p 27017:27017 --name mongodb mongo:latest
 ```bash
 cd Backend
 
-# Run the user creation script
-npx ts-node create-user.ts
+# Create a user with custom credentials
+npx ts-node create-user.ts <username> <password>
+
+# Example: Create admin user
+npx ts-node create-user.ts admin admin123
+
+# Example: Create coach user
+npx ts-node create-user.ts coach football2024
 ```
 
-Default credentials:
+**Script Features:**
+- ✅ **Password Hashing**: Automatically hashes passwords with bcrypt
+- ✅ **Validation**: Ensures username and password are provided
+- ✅ **Database Integration**: Creates users directly in the database
+- ✅ **Error Handling**: Clear error messages for common issues
+
+**Example Output:**
+```bash
+# Success
+User created: { id: '...', username: 'admin', password: 'hashed_password' }
+
+# Error - missing parameters
+Usage: ts-node create-user.ts <username> <password>
+```
+
+**Prerequisites:**
+- Database must be running
+- Prisma client generated (`npx prisma generate`)
+- Environment variables set in `.env`
+- Dependencies installed (`npm install`)
+
+Default test credentials (after running the script):
 - Username: `admin`
 - Password: `admin123`
 
