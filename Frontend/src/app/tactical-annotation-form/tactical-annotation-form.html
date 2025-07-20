@@ -3,29 +3,76 @@
     <h2 class="tactical-annotation-title">Annotation Tactique</h2>
     <p class="tactical-annotation-subtitle">Remplissez les informations d'analyse de la séquence</p>
   </div>
-  <form class="tactical-annotation-form">
+
+  <!-- Status Messages -->
+  <div *ngIf="submitError" class="submit-status error">
+    <p>{{ submitError }}</p>
+  </div>
+  
+  <div *ngIf="submitSuccess" class="submit-status success">
+    <p>Annotation créée avec succès!</p>
+  </div>
+
+  <form class="tactical-annotation-form" (ngSubmit)="onSubmit()">
     <div class="row">
       <div class="form-group">
         <label for="equipe-domicile">Équipe Domicile *</label>
-        <input id="equipe-domicile" type="text" placeholder="Ex: PSG" required>
+        <input 
+          id="equipe-domicile" 
+          type="text" 
+          placeholder="Ex: PSG" 
+          required
+          [(ngModel)]="formData.equipeDomicile"
+          name="equipeDomicile">
       </div>
       <div class="form-group">
         <label for="equipe-visiteuse">Équipe Visiteuse *</label>
-        <input id="equipe-visiteuse" type="text" placeholder="Ex: OM" required>
+        <input 
+          id="equipe-visiteuse" 
+          type="text" 
+          placeholder="Ex: OM" 
+          required
+          [(ngModel)]="formData.equipeVisiteuse"
+          name="equipeVisiteuse">
       </div>
     </div>
     <div class="form-group">
       <label for="entraineur">Entraîneur *</label>
-      <input id="entraineur" type="text" placeholder="Nom de l'entraîneur" required>
+      <input 
+        id="entraineur" 
+        type="text" 
+        placeholder="Nom de l'entraîneur" 
+        required
+        [(ngModel)]="formData.entraineur"
+        name="entraineur">
     </div>
     <div class="form-group">
       <label for="annotation-tactique">Annotation Tactique *</label>
-      <textarea id="annotation-tactique" placeholder="Donnez un label à ce schéma tactique (ex : Bloc bas, Pressing haut, etc.)" required></textarea>
+      <textarea 
+        id="annotation-tactique" 
+        placeholder="Donnez un label à ce schéma tactique (ex : Bloc bas, Pressing haut, etc.)" 
+        required
+        [(ngModel)]="formData.annotationTactique"
+        name="annotationTactique"></textarea>
     </div>
     <div class="form-group">
       <label for="commentaire">Commentaire</label>
-      <textarea id="commentaire" placeholder="Commentaires supplémentaires..."></textarea>
+      <textarea 
+        id="commentaire" 
+        placeholder="Commentaires supplémentaires..."
+        [(ngModel)]="formData.commentaire"
+        name="commentaire"></textarea>
     </div>
-    <button type="submit">Sauvegarder l'Annotation</button>
+    <button 
+      type="submit" 
+      [disabled]="!canSubmit() || isSubmitting">
+      {{ isSubmitting ? 'Création en cours...' : 'Sauvegarder l\'Annotation' }}
+    </button>
   </form>
+
+  <!-- Video Info Display -->
+  <div *ngIf="uploadedVideo" class="video-info">
+    <p><strong>Vidéo sélectionnée:</strong> {{ getDisplayFilename() }}</p>
+    <p><strong>ID Séquence:</strong> {{ getIdSequenceDisplay() }}</p>
+  </div>
 </div>

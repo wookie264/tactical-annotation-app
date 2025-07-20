@@ -10,10 +10,25 @@
       </span>
       Séquence Vidéo
     </h2>
-    <p class="video-upload-subtitle">Uploadez une séquence de 5-7 secondes maximum</p>
+    <p class="video-upload-subtitle">Uploadez une séquence de 3-7 secondes</p>
   </div>
-  <label class="video-upload-dropzone">
-    <input type="file" accept="video/*" class="video-upload-input" (change)="onFileSelected($event)">
+  
+  <!-- Upload Status Messages -->
+  <div *ngIf="isUploading" class="upload-status uploading">
+    <p>Upload en cours...</p>
+  </div>
+  
+  <div *ngIf="uploadError" class="upload-status error">
+    <p>{{ uploadError }}</p>
+  </div>
+  
+  <div *ngIf="uploadSuccess && uploadedVideo" class="upload-status success">
+    <p>Vidéo uploadée avec succès!</p>
+    <p *ngIf="uploadedVideo.filename">Fichier: {{ uploadedVideo.filename }}</p>
+  </div>
+
+  <label class="video-upload-dropzone" [class.disabled]="isUploading">
+    <input type="file" accept="video/*" class="video-upload-input" (change)="onFileSelected($event)" [disabled]="isUploading">
     <span class="video-upload-icon">
       <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" stroke="#94a3b8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 48 48">
         <path d="M24 32V12"/>
@@ -21,6 +36,8 @@
         <path d="M8 36v2a2 2 0 0 0 2 2h28a2 2 0 0 0 2-2v-2"/>
       </svg>
     </span>
-    <span class="video-upload-text">Cliquez pour sélectionner une vidéo</span>
+    <span class="video-upload-text">
+      {{ isUploading ? 'Upload en cours...' : 'Cliquez pour sélectionner une vidéo' }}
+    </span>
   </label>
 </div>

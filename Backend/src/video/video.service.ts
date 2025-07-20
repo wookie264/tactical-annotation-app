@@ -130,9 +130,16 @@ export class VideoService {
     // Save file to disk
     fs.writeFileSync(filePath, file.buffer);
 
-    // Validate video duration (max 7 seconds)
+    // Validate video duration (min 3 seconds, max 7 seconds)
     try {
       const duration = await this.getVideoDuration(filePath);
+      
+      if (duration < 3) {
+        // Delete the uploaded file if duration is too short
+        fs.unlinkSync(filePath);
+        throw new BadRequestException(`Video too short. Duration: ${duration.toFixed(2)}s. Minimum duration is 3 seconds.`);
+      }
+      
       if (duration > 7) {
         // Delete the uploaded file if duration is too long
         fs.unlinkSync(filePath);

@@ -1,13 +1,12 @@
-import { Component, signal } from '@angular/core';
-import { VideoUpload } from './video-upload/video-upload';
-import { TacticalAnnotationForm } from './tactical-annotation-form/tactical-annotation-form';
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [VideoUpload, TacticalAnnotationForm],
+  imports: [RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App {
-  protected readonly title = signal('tactical-annotation-frontend');
+  protected readonly title = 'tactical-annotation-frontend';
 }
