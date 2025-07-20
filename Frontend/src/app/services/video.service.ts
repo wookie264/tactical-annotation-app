@@ -64,6 +64,13 @@ export class VideoService {
     });
   }
 
+  // Check if a video with the given filename already exists
+  checkVideoExists(filename: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/getAllVideos`, {
+      headers: this.getHeaders()
+    });
+  }
+
   deleteVideo(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/deleteVideo/${id}`, {
       headers: this.getHeaders()

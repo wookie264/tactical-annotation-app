@@ -29,6 +29,7 @@ export interface Annotation {
 })
 export class AnnotationService {
   private apiUrl = 'http://localhost:3000/annotation'; // Adjust port as needed
+  private videoApiUrl = 'http://localhost:3000/video'; // Video API URL
 
   constructor(private http: HttpClient) {}
 
@@ -37,6 +38,13 @@ export class AnnotationService {
     return new HttpHeaders({
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
+    });
+  }
+
+  // Validate if video exists before creating annotation
+  validateVideoExists(videoId: string): Observable<any> {
+    return this.http.get(`${this.videoApiUrl}/getVideoById/${videoId}`, {
+      headers: this.getHeaders()
     });
   }
 

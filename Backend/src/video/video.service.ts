@@ -1,108 +1,68 @@
 /* eslint-disable prettier/prettier */
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { Injectable, BadRequestException } from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateVideoDto, UpdateVideoDto } from './dto/video.dto';
-import { Prisma } from '@prisma/client';
+import { AnnotationService } from '../annotation/annotation.service';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as ffmpeg from 'fluent-ffmpeg';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+
+const execAsync = promisify(exec);
 
 @Injectable()
 export class VideoService {
-  constructor(private prisma: PrismaService) {}
-
-  private getVideoDuration(filePath: string): Promise<number> {
-    return new Promise((resolve, reject) => {
-      ffmpeg.ffprobe(filePath, (err, metadata) => {
-        if (err) {
-          reject(new Error('Failed to get video duration'));
-        } else {
-          const duration = (metadata as { format?: { duration?: number } })?.format?.duration;
-          resolve(duration || 0);
-        }
-      });
-    });
-  }
+  constructor(
+    private prisma: PrismaService,
+    private annotationService: AnnotationService
+  ) {}
 
   async getAllVideos() {
-    return await this.prisma.video.findMany({
-      include: {
-        annotations: true,
-      },
-    });
+    return await this.prisma.video.findMany();
   }
 
   async getVideoById(id: string) {
-    const video = await this.prisma.video.findUnique({
+    return await this.prisma.video.findUnique({
       where: { id },
-      include: {
-        annotations: true,
-      },
     });
-    
-    if (!video) {
-      throw new NotFoundException(`Video with id '${id}' not found`);
-    }
-    
-    return video;
   }
 
   async createVideo(createVideoDto: CreateVideoDto) {
-    try {
-      return await this.prisma.video.create({
-        data: createVideoDto,
-        include: {
-          annotations: true,
-        },
-      });
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2002') {
-          throw new BadRequestException(`Video with path '${createVideoDto.path}' already exists`);
-        }
-      }
-      throw new BadRequestException('Failed to create video');
-    }
+    return await this.prisma.video.create({
+      data: createVideoDto,
+    });
   }
 
   async updateVideo(id: string, updateVideoDto: UpdateVideoDto) {
-    try {
-      return await this.prisma.video.update({
-        where: { id },
-        data: updateVideoDto,
-        include: {
-          annotations: true,
-        },
-      });
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
-          throw new NotFoundException(`Video with id '${id}' not found`);
-        }
-      }
-      throw new BadRequestException('Failed to update video');
-    }
+    return await this.prisma.video.update({
+      where: { id },
+      data: updateVideoDto,
+    });
   }
 
   async deleteVideo(id: string) {
+    return await this.prisma.video.delete({
+      where: { id },
+    });
+  }
+
+  private async validateVideoDuration(filePath: string): Promise<void> {
     try {
-      const video = await this.prisma.video.delete({
-        where: { id },
-      });
+      const { stdout } = await execAsync(`ffprobe -v quiet -show_entries format=duration -of csv=p=0 "${filePath}"`);
+      const duration = parseFloat(stdout.trim());
       
-      // Try to delete the actual file if it exists
-      if (video.path && fs.existsSync(video.path)) {
-        fs.unlinkSync(video.path);
+      if (isNaN(duration) || duration <= 0) {
+        throw new BadRequestException('Invalid video file or unable to determine duration');
       }
       
-      return video;
+      if (duration > 300) { // 5 minutes limit
+        throw new BadRequestException('Video duration exceeds 5 minutes limit');
+      }
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
-          throw new NotFoundException(`Video with id '${id}' not found`);
-        }
+      if (error instanceof BadRequestException) {
+        throw error;
       }
-      throw new BadRequestException('Failed to delete video');
+      throw new BadRequestException('Failed to validate video file');
     }
   }
 
@@ -115,6 +75,17 @@ export class VideoService {
     const allowedMimeTypes = ['video/mp4', 'video/avi', 'video/mov', 'video/wmv', 'video/flv'];
     if (!allowedMimeTypes.includes(file.mimetype)) {
       throw new BadRequestException('Invalid file type. Only video files are allowed.');
+    }
+
+    // Check for duplicate filename
+    const existingVideo = await this.prisma.video.findFirst({
+      where: {
+        filename: file.originalname
+      }
+    });
+
+    if (existingVideo) {
+      throw new BadRequestException(`A video with the filename '${file.originalname}' already exists. Please use a different filename or delete the existing video first.`);
     }
 
     // Create uploads directory if it doesn't exist
@@ -130,38 +101,90 @@ export class VideoService {
     // Save file to disk
     fs.writeFileSync(filePath, file.buffer);
 
-    // Validate video duration (min 3 seconds, max 7 seconds)
-    try {
-      const duration = await this.getVideoDuration(filePath);
-      
-      if (duration < 3) {
-        // Delete the uploaded file if duration is too short
-        fs.unlinkSync(filePath);
-        throw new BadRequestException(`Video too short. Duration: ${duration.toFixed(2)}s. Minimum duration is 3 seconds.`);
-      }
-      
-      if (duration > 7) {
-        // Delete the uploaded file if duration is too long
-        fs.unlinkSync(filePath);
-        throw new BadRequestException(`Video too long. Duration: ${duration.toFixed(2)}s. Maximum duration is 7 seconds.`);
-      }
-    } catch (error) {
-      // Delete the uploaded file if duration check fails
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-      }
-      if (error instanceof BadRequestException) {
-        throw error;
-      }
-      throw new BadRequestException('Failed to validate video duration. Please try again.');
-    }
+    // Validate video duration
+    await this.validateVideoDuration(filePath);
 
-    // Save video info to database
+    // Save video info to database (only path field exists in schema)
     const videoData = {
       path: filePath,
       filename: file.originalname,
     };
 
     return await this.createVideo(videoData);
+  }
+
+  async bulkUpload(files: { mimetype: string; size: number; originalname: string; buffer: Buffer }[], annotations: any) {
+    const results: {
+      videos: any[];
+      annotations: any[];
+      errors: Array<{ file?: string; annotation?: string; error: string }>;
+    } = {
+      videos: [],
+      annotations: [],
+      errors: []
+    };
+
+    // Separate videos and JSON files
+    const videoFiles = files.filter(file => 
+      file.mimetype.startsWith('video/') || 
+      file.originalname.match(/\.(mp4|avi|mov|wmv|flv)$/i)
+    );
+
+    // Process videos first and store them with their filenames
+    const uploadedVideos = new Map<string, any>();
+    
+    for (const videoFile of videoFiles) {
+      try {
+        const video = await this.uploadVideo(videoFile);
+        results.videos.push(video);
+        
+        // Store video by filename (without extension) for annotation matching
+        const videoName = videoFile.originalname.replace(/\.[^/.]+$/, '');
+        uploadedVideos.set(videoName, video);
+      } catch (error) {
+        results.errors.push({
+          file: videoFile.originalname,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
+      }
+    }
+
+    // Process annotations if provided
+    if (annotations && Array.isArray(annotations)) {
+      for (const annotation of annotations) {
+        try {
+          // Find the corresponding video for this annotation
+          const videoName = annotation.id_sequence;
+          const correspondingVideo = uploadedVideos.get(videoName);
+          
+          if (!correspondingVideo) {
+            results.errors.push({
+              annotation: annotation.id_sequence || 'unknown',
+              error: `No corresponding video found for annotation ${annotation.id_sequence}`
+            });
+            continue;
+          }
+
+          // Add the videoId to the annotation
+          const annotationWithVideoId = {
+            ...annotation,
+            videoId: correspondingVideo.id,
+            domicile: annotation.domicile || null,
+            visiteuse: annotation.visiteuse || null
+          };
+
+          // Create annotation using the annotation service
+          const createdAnnotation = await this.annotationService.createAnnotation(annotationWithVideoId);
+          results.annotations.push(createdAnnotation);
+        } catch (error) {
+          results.errors.push({
+            annotation: annotation.id_sequence || 'unknown',
+            error: error instanceof Error ? error.message : 'Unknown error'
+          });
+        }
+      }
+    }
+
+    return results;
   }
 }

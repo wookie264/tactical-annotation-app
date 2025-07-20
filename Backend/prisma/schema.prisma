@@ -16,6 +16,7 @@ generator client {
 model Video {
   id         String      @id @default(auto()) @map("_id") @db.ObjectId
   path       String
+  filename   String?
   annotations Annotation[]
 }
 
@@ -26,8 +27,8 @@ model Annotation {
   validateur       String
   date_annotation  DateTime?        @default(now())
   commentaire      String
-  domicile         String
-  visiteuse        String
+  domicile         String?
+  visiteuse        String?
 
   videoId          String           @db.ObjectId
   video            Video            @relation(fields: [videoId], references: [id])

@@ -1,12 +1,14 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { VideoUpload } from '../video-upload/video-upload';
 import { TacticalAnnotationForm } from '../tactical-annotation-form/tactical-annotation-form';
+import { BulkUpload } from '../bulk-upload/bulk-upload';
 import { Video } from '../services/video.service';
 import { AuthService, User } from '../services/auth.service';
 
 @Component({
   selector: 'app-home',
-  imports: [VideoUpload, TacticalAnnotationForm],
+  imports: [CommonModule, VideoUpload, TacticalAnnotationForm, BulkUpload],
   templateUrl: './home.html',
   styleUrl: './home.css'
 })
@@ -14,6 +16,7 @@ export class Home {
   protected readonly title = 'Analyse Tactique Football';
   uploadedVideo: Video | null = null;
   currentUser: User | null = null;
+  showBulkUpload = false;
 
   constructor(private authService: AuthService) {
     this.currentUser = this.authService.getCurrentUser();
@@ -26,8 +29,14 @@ export class Home {
 
   onAnnotationCreated(annotation: any) {
     console.log('Annotation created in home component:', annotation);
-    // You can add additional logic here, such as showing a success message
-    // or redirecting to another page
+  }
+
+  onNavigateToBulkUpload() {
+    this.showBulkUpload = true;
+  }
+
+  onBackFromBulkUpload() {
+    this.showBulkUpload = false;
   }
 
   logout() {

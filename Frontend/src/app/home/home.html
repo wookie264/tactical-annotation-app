@@ -9,11 +9,20 @@
   </div>
 </div>
 
-<p class="sous-titre">Annotez vos séquences vidéo pour analyser les schémas tactiques</p>
-<div class="app-main-layout">
-  <app-video-upload (videoUploaded)="onVideoUploaded($event)"></app-video-upload>
-  <app-tactical-annotation-form 
-    [uploadedVideo]="uploadedVideo"
-    (annotationCreated)="onAnnotationCreated($event)">
-  </app-tactical-annotation-form>
+<!-- Main Content -->
+<div *ngIf="!showBulkUpload">
+  <p class="sous-titre">Annotez vos séquences vidéo pour analyser les schémas tactiques</p>
+  <div class="app-main-layout">
+    <app-video-upload (videoUploaded)="onVideoUploaded($event)"></app-video-upload>
+    <app-tactical-annotation-form 
+      [uploadedVideo]="uploadedVideo"
+      (annotationCreated)="onAnnotationCreated($event)"
+      (navigateToBulkUpload)="onNavigateToBulkUpload()">
+    </app-tactical-annotation-form>
+  </div>
+</div>
+
+<!-- Bulk Upload Page -->
+<div *ngIf="showBulkUpload">
+  <app-bulk-upload (goBackEvent)="onBackFromBulkUpload()"></app-bulk-upload>
 </div> 
