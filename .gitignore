@@ -6,7 +6,8 @@
 **/node_modules/
 **/dist/
 **/build/
-
+PROJECT_OVERVIEW.txt
+APERÇU_DU_PROJET.txt
 # Ignore environment files
 **/.env
 **/.env.
