@@ -29,7 +29,7 @@ Desktop.ini
 .idea/
 
 # ===============================
-# 🧠 Angular Specific (frontend/)
+# 🤠 Angular Specific (frontend/)
 # ===============================
 frontend/.angular/cache/
 frontend/.angular/config.json
@@ -39,7 +39,6 @@ frontend/.angular/tmp/
 
 # Angular CLI
 frontend/angular.json
-frontend/package-lock.json
 frontend/yarn.lock
 
 # Test and coverage
@@ -48,13 +47,12 @@ frontend/test-results/
 frontend/karma-results/
 
 # ===============================
-# 🧠 NestJS Specific (backend/)
+# 🤠 NestJS Specific (backend/)
 # ===============================
 backend/.nestjs/
 backend/dist/
 backend/node_modules/
 backend/coverage/
-backend/package-lock.json
 backend/yarn.lock
 
 # TypeScript build info
