@@ -39,7 +39,6 @@ frontend/.angular/tsconfig*
 frontend/.angular/tmp/
 
 # Angular CLI
-frontend/angular.json
 frontend/package-lock.json
 frontend/yarn.lock
 
