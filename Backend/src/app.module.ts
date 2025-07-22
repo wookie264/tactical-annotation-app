@@ -8,8 +8,9 @@ import { PrismaService } from './prisma/prisma.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { RapportModule } from './rapport/rapport.module';
 import { AuthModule } from './auth/auth.module';
+import { MailModule } from './mail/mail.module';
 @Module({
-  imports: [AnnotationModule, PrismaModule, VideoModule, RapportModule, AuthModule],
+  imports: [AnnotationModule, PrismaModule, VideoModule, RapportModule, AuthModule, MailModule],
   controllers: [AppController],
   providers: [AppService, PrismaService],
 })
