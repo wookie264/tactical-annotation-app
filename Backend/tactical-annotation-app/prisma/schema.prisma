@@ -54,3 +54,17 @@ model RapportAnalyse {
   annotation   Annotation? @relation("AnnotationToRapport", fields: [annotationId], references: [id])
 }
 
+model Admin {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  username String  @unique
+  password String  @unique
+  email    String  @unique
+}
+
+model User {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  username    String  @unique
+  password    String  @unique
+  email       String  @unique
+  phoneNumber String
+}
