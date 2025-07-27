@@ -1,0 +1,77 @@
+<div class="login-container">
+  <div class="login-card">
+    <h2>Bienvenue</h2>
+    <p class="subtitle">Connectez-vous pour accéder à l'outil d'analyse tactique</p>
+
+    <!-- Login Error Message -->
+    <div *ngIf="loginError" class="login-error">
+      <p>{{ loginError }}</p>
+    </div>
+
+    <!-- Success Message -->
+    <div *ngIf="successMessage" class="success-message">
+      <p>{{ successMessage }}</p>
+    </div>
+
+    <!-- Login Form -->
+    <form *ngIf="!showForgotPassword" (ngSubmit)="onLogin()">
+      <input 
+        type="text" 
+        placeholder="Nom d'utilisateur" 
+        required
+        [(ngModel)]="loginData.username"
+        name="username"
+        [disabled]="isLoggingIn">
+      
+      <input 
+        type="password" 
+        placeholder="Mot de passe" 
+        required
+        [(ngModel)]="loginData.password"
+        name="password"
+        [disabled]="isLoggingIn">
+      
+      <div class="remember-me">
+        <label>
+          <input 
+            type="checkbox" 
+            [(ngModel)]="loginData.rememberMe"
+            name="rememberMe"
+            [disabled]="isLoggingIn">
+          Se souvenir de moi (30 jours)
+        </label>
+      </div>
+      
+      <button 
+        type="submit"
+        [disabled]="isLoggingIn">
+        {{ isLoggingIn ? 'Connexion en cours...' : 'Se connecter' }}
+      </button>
+
+      <div class="forgot-password-link">
+        <a href="#" (click)="showForgotPasswordForm()">Mot de passe oublié ?</a>
+      </div>
+    </form>
+
+    <!-- Forgot Password Form -->
+    <form *ngIf="showForgotPassword" (ngSubmit)="onForgotPassword()">
+      <input 
+        type="email" 
+        placeholder="Adresse email" 
+        required
+        [(ngModel)]="forgotPasswordEmail"
+        name="email"
+        [disabled]="isProcessing">
+      
+      <button 
+        type="submit"
+        [disabled]="isProcessing">
+        {{ isProcessing ? 'Envoi en cours...' : 'Envoyer le lien de réinitialisation' }}
+      </button>
+
+      <div class="back-to-login">
+        <a href="#" (click)="showLoginForm()">Retour à la connexion</a>
+      </div>
+    </form>
+  </div>
+</div>

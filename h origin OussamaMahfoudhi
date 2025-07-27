@@ -1,0 +1,55 @@
+* [33m491c399[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mOussamaMahfoudhi[m[33m)[m added frontend
+*   [33m021f03b[m[33m ([m[1;31morigin/OussamaMahfoudhi[m[33m)[m Merge branch 'main' of https://github.com/wookie264/tactical-annotation-app into OussamaMahfoudhi
+[32m|[m[33m\[m  
+[32m|[m *   [33m3cbda82[m Merge pull request #2 from wookie264/OussamaMahfoudhi
+[32m|[m [34m|[m[35m\[m  
+* [34m|[m [35m|[m [33m5f531de[m added video module and protected it and added update to rapport
+* [34m|[m [35m|[m [33mdd0a8ce[m added video module and protected it and added update to rapport
+[35m|[m [34m|[m[35m/[m  
+[35m|[m[35m/[m[34m|[m   
+* [34m|[m [33m2f38294[m protected routes
+* [34m|[m [33m6363bc3[m Removed Useless files
+* [34m|[m [33m7815d03[m updated prisma module
+* [34m|[m [33m1799860[m added auth modules and removed users module  and added create user script
+* [34m|[m [33m9eed921[m added users module and auth module
+* [34m|[m   [33m25ae5d3[m Resolved merge conflicts
+[36m|[m[1;31m\[m [34m\[m  
+[36m|[m * [34m|[m [33m5bb0416[m Added RapportAnalayse Module controller service
+[36m|[m * [34m|[m [33m90e31cc[m Added RapportAnalayse Module controller service
+[36m|[m * [34m|[m   [33m21acd84[m Merge branch 'OussamaMahfoudhi' of https://github.com/wookie264/tactical-annotation-app into OussamaMahfoudhi
+[36m|[m [1;32m|[m[1;33m\[m [34m\[m  
+[36m|[m [1;32m|[m * [34m|[m [33mcdda543[m copied from hadil to Oussama
+[36m|[m [1;32m|[m * [34m|[m [33m3d7fd55[m fixed package.json
+* [1;32m|[m [1;33m|[m [34m|[m [33me1930a1[m added user in schema
+[34m|[m [1;32m|[m[34m_[m[1;33m|[m[34m/[m  
+[34m|[m[34m/[m[1;32m|[m [1;33m|[m   
+[34m|[m [1;32m|[m [1;33m|[m * [33md54cc53[m[33m ([m[1;31morigin/OussemaBenAmor[m[33m)[m CRUD video+annotation+rapport
+[34m|[m [1;32m|[m [1;33m|[m * [33m97274a0[m annotatin CRUD + video CRUD
+[34m|[m [1;32m|[m [1;33m|[m * [33m6c3d03d[m CRUD video
+[34m|[m [1;32m|[m [1;33m|[m [1;34m|[m * [33m9a81050[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m sync with main
+[34m|[m [1;32m|[m[34m_[m[1;33m|[m[34m_[m[1;34m|[m[34m/[m  
+[34m|[m[34m/[m[1;32m|[m [1;33m|[m [1;34m|[m   
+* [1;32m|[m [1;33m|[m [1;34m|[m [33m54b422c[m deleted useless folders
+* [1;32m|[m [1;33m|[m [1;34m|[m [33m31839af[m organized the backend folder
+[1;35m|[m [1;32m|[m [1;33m|[m [1;34m|[m * [33m9206bc3[m[33m ([m[1;31morigin/Moataz[m[33m)[m ajout front
+[1;35m|[m [1;32m|[m [1;33m|[m [1;34m|[m * [33m571b3b7[m ajout front
+[1;35m|[m [1;32m|[m[1;35m_[m[1;33m|[m[1;35m_[m[1;34m|[m[1;35m/[m  
+[1;35m|[m[1;35m/[m[1;32m|[m [1;33m|[m [1;34m|[m   
+* [1;32m|[m [1;33m|[m [1;34m|[m [33m635ec56[m Merge pull request #1 from wookie264/hadil
+[31m|[m[1;32m\[m[1;32m|[m [1;33m|[m [1;34m|[m 
+[31m|[m * [1;33m|[m [1;34m|[m [33me8a90f0[m[33m ([m[1;32mhadil[m[33m)[m fixed annotation dto in annotation service
+[31m|[m [32m|[m [1;33m|[m [1;34m|[m * [33m6e8f91a[m[33m ([m[1;31morigin/moataztriki[m[33m)[m Initialise fornt
+[31m|[m [32m|[m[31m_[m[1;33m|[m[31m_[m[1;34m|[m[31m/[m  
+[31m|[m[31m/[m[32m|[m [1;33m|[m [1;34m|[m   
+[31m|[m [32m|[m [1;33m|[m [1;34m|[m * [33m170f88f[m[33m ([m[1;31morigin/hadil[m[33m)[m removed isDate from dto
+[31m|[m [32m|[m [1;33m|[m[32m_[m[1;34m|[m[32m/[m  
+[31m|[m [32m|[m[32m/[m[1;33m|[m [1;34m|[m   
+[31m|[m * [1;33m|[m [1;34m|[m [33m7bfa5c4[m added crud functions in annotation module
+[31m|[m[31m/[m [1;33m/[m [1;34m/[m  
+* [1;33m/[m [1;34m/[m [33mdfca3c4[m fixed package.json
+[1;33m|[m[1;33m/[m [1;34m/[m  
+* [1;34m/[m [33m971397e[m added prisma service / prisma schema / added rapport module service controller
+[1;34m|[m[1;34m/[m  
+* [33ma162e90[m added Video and Annotation Modules controllers Services
+* [33m885b08a[m Initial commit with NestJS backend and Angular frontend
+* [33m55ed78f[m Initial commit
