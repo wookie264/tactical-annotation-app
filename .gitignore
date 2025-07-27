@@ -9,7 +9,6 @@
 
 # Ignore environment files
 **/.env
-**/.env.
 
 # Logs
 logs/
@@ -38,7 +37,6 @@ frontend/.angular/tsconfig*
 frontend/.angular/tmp/
 
 # Angular CLI
-frontend/angular.json
 frontend/yarn.lock
 
 # Test and coverage
