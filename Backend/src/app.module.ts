@@ -11,6 +11,7 @@ import { RapportModule } from './rapport/rapport.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { AIAnnotationModule } from './ai-annotation/ai-annotation.module';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -21,7 +22,8 @@ import { AIAnnotationModule } from './ai-annotation/ai-annotation.module';
     RapportModule, 
     AuthModule,
     UserModule,
-    AIAnnotationModule
+    AIAnnotationModule,
+    EmailModule
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
