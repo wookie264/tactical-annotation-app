@@ -31,6 +31,7 @@
             loop
             width="100%"
             style="width:100%;height:auto;max-width:100%;object-fit:fill;"
+            (loadedmetadata)="onVideoMetadataLoaded($event, videoPlayer)"
             #videoPlayer>
             Votre navigateur ne supporte pas la lecture de vidéos.
           </video>

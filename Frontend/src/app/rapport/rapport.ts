@@ -72,6 +72,13 @@ export class Rapport implements OnInit {
     return (video.currentTime / video.duration) * 100;
   }
 
+  onVideoMetadataLoaded(event: any, video: HTMLVideoElement) {
+    // Ensure video is muted
+    video.muted = true;
+    video.volume = 0;
+    console.log('🔇 Video muted for rapport');
+  }
+
   deleteRapport(id_sequence: string) {
     if (confirm('Êtes-vous sûr de vouloir supprimer ce rapport IA ? Cette action supprimera également l\'annotation et la vidéo associées et ne peut pas être annulée.')) {
       this.rapportService.deleteRapport(id_sequence).subscribe({

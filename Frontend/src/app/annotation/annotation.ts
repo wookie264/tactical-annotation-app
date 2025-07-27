@@ -111,7 +111,14 @@ export class Annotation implements OnInit {
   }
 
   onVideoLoaded(ann: any) {
-    console.log('✅ Video loaded successfully for annotation:', ann.id_sequence);
+    console.log('✅ Video loaded for annotation:', ann.id_sequence);
+  }
+
+  onVideoMetadataLoaded(event: any, video: HTMLVideoElement) {
+    // Ensure video is muted
+    video.muted = true;
+    video.volume = 0;
+    console.log('🔇 Video muted for annotation');
   }
 
   deleteAnnotation(id_sequence: string) {

@@ -33,6 +33,7 @@
             style="width:100%;height:auto;max-width:100%;object-fit:cover;"
             (error)="onVideoError($event, ann)"
             (loadeddata)="onVideoLoaded(ann)"
+            (loadedmetadata)="onVideoMetadataLoaded($event, videoPlayer)"
             #videoPlayer>
             Votre navigateur ne supporte pas la lecture de vidéos.
           </video>
