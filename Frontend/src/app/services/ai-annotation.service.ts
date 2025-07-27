@@ -5,7 +5,7 @@ import { AuthService } from './auth.service';
 
 export interface AIAnnotationRequest {
   videoId: string;
-  annotationId: string;
+  annotationId?: string; // Optional - only if analyzing an existing manual annotation
   videoPath: string;
 }
 
@@ -33,6 +33,7 @@ export interface AIAnnotationResult {
   success: boolean;
   rapport: Rapport;
   aiAnalysis: AIAnalysisResponse;
+  linkedAnnotation?: any; // Only if analyzing existing annotation
 }
 
 @Injectable({

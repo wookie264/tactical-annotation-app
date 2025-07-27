@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import {IsNotEmpty,IsString,IsOptional} from "class-validator"
 
-export class AnnotationDto {
+export class ManualAnnotationDto {
   @IsString()
   @IsNotEmpty()
   id_sequence: string;

@@ -44,6 +44,12 @@
       <ng-container *ngIf="selectedHistory === 'ia'">
         <app-rapport></app-rapport>
       </ng-container>
+      
+      <ng-container *ngIf="!selectedHistory">
+        <div class="no-selection">
+          <p>Sélectionnez un type d'annotation pour voir l'historique</p>
+        </div>
+      </ng-container>
     </div>
   </div>
 </div>

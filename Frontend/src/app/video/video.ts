@@ -1,7 +1,8 @@
 import { Component, EventEmitter, Output, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { VideoService } from '../services/video.service';
+import { AIVideoService, Video } from '../services/ai-video.service';
 import { AuthService, User } from '../services/auth.service';
+import { AIAnnotationService } from '../services/ai-annotation.service';
 import { Router } from '@angular/router';
 
 
@@ -12,7 +13,7 @@ import { Router } from '@angular/router';
   templateUrl: './video.html',
   styleUrl: './video.css'
 })
-export class Video implements OnDestroy {
+export class VideoComponent implements OnDestroy {
   currentUser: User | null = null;
   selectedFile: File | null = null;
   fileName: string | null = null;
@@ -27,9 +28,10 @@ export class Video implements OnDestroy {
 
   
   constructor(
-    private videoService: VideoService,
+    private aiVideoService: AIVideoService,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private aiAnnotationService: AIAnnotationService
   ) {this.currentUser = this.authService.getCurrentUser();}
 
   onFileSelected(event: Event) {
@@ -53,7 +55,7 @@ export class Video implements OnDestroy {
   }
 
   private checkForDuplicate(filename: string) {
-    this.videoService.checkVideoExists(filename).subscribe({
+    this.aiVideoService.getAllVideos().subscribe({
       next: (response) => {
         const videos = response.data || [];
         const existingVideo = videos.find((video: any) => video.filename === filename);
@@ -81,7 +83,7 @@ export class Video implements OnDestroy {
 
           // Uploading file
 
-    this.videoService.uploadVideo(this.selectedFile).subscribe({
+    this.aiVideoService.uploadVideo(this.selectedFile).subscribe({
       next: (response) => {
         this.isUploading = false;
         this.uploadSuccess = true;
@@ -134,8 +136,8 @@ export class Video implements OnDestroy {
 
   // Get the id_sequence from the uploaded video filename
   getIdSequence(): string | null {
-    if (this.uploadedVideo?.fileName) {
-      return this.videoService.generateIdSequence(this.uploadedVideo.fileName);
+    if (this.uploadedVideo?.filename) {
+      return this.aiVideoService.generateIdSequence(this.uploadedVideo.filename);
     }
     return null;
   }
@@ -158,6 +160,34 @@ export class Video implements OnDestroy {
 }
   goBack() {
     this.router.navigate(['/userhome']);
+  }
+
+  triggerPrediction() {
+    if (!this.uploadedVideo) {
+      alert('Veuillez d\'abord uploader une vidéo');
+      return;
+    }
+
+    if (confirm('Voulez-vous analyser cette vidéo avec l\'IA ? Cela créera un rapport d\'analyse IA.')) {
+      // Create AI analysis request for the uploaded video (no manual annotation)
+      const request = {
+        videoId: this.uploadedVideo.id,
+        videoPath: this.uploadedVideo.path || this.uploadedVideo.filename || ''
+        // No annotationId - this is direct AI analysis on video
+      };
+
+      this.aiAnnotationService.processAIAnnotation(request).subscribe({
+        next: (response) => {
+          alert('Analyse IA terminée avec succès ! Un rapport d\'analyse a été créé.');
+          // Navigate to the rapport page to see the results
+          this.router.navigate(['/rapport']);
+        },
+        error: (error) => {
+          console.error('AI analysis error:', error);
+          alert('Erreur lors de l\'analyse IA. Veuillez réessayer.');
+        }
+      });
+    }
   }
 }
 

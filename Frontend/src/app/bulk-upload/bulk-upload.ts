@@ -18,6 +18,9 @@ interface UploadFile {
   type: 'video' | 'json';
   id_sequence?: string;
   correspondingJson?: string;
+  status: 'pending' | 'processing' | 'success' | 'error';
+  error?: string;
+  progress?: number;
 }
 
 @Component({
@@ -28,6 +31,9 @@ interface UploadFile {
 })
 export class BulkUpload {
   @Output() goBackEvent = new EventEmitter<void>();
+  
+  // Make Math available in template
+  Math = Math;
   
   isProcessing = false;
   processingError: string | null = null;
@@ -48,7 +54,14 @@ export class BulkUpload {
   isDragOver = false;
   uploadError: string | null = null;
   uploadSuccess = false;
-  readonly MAX_FILES = 5;
+  
+  // Queue System
+  isQueueProcessing = false;
+  queueProgress = 0;
+  processedCount = 0;
+  successCount = 0;
+  errorCount = 0;
+  currentProcessingIndex = -1;
 
   constructor(private bulkUploadService: BulkUploadService) {}
 
@@ -262,10 +275,10 @@ export class BulkUpload {
   }
 
   // File Upload Methods
-  onFileSelected(event: Event) {
+  async onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files) {
-      this.handleFiles(Array.from(input.files));
+      await this.handleFiles(Array.from(input.files));
     }
   }
 
@@ -279,29 +292,35 @@ export class BulkUpload {
     this.isDragOver = false;
   }
 
-  onDrop(event: DragEvent) {
+  async onDrop(event: DragEvent) {
     event.preventDefault();
     this.isDragOver = false;
     
     if (event.dataTransfer?.files) {
-      this.handleFiles(Array.from(event.dataTransfer.files));
+      await this.handleFiles(Array.from(event.dataTransfer.files));
     }
   }
 
-  private handleFiles(files: File[]) {
+  private async handleFiles(files: File[]) {
     // Check if adding these files would exceed the limit
     const currentCount = this.uploadedFiles.length;
     const newFilesCount = files.length;
-    
-    if (currentCount + newFilesCount > this.MAX_FILES) {
-      this.uploadError = `Limite de ${this.MAX_FILES} fichiers atteinte. Vous avez ${currentCount} fichiers et essayez d'ajouter ${newFilesCount} fichiers.`;
-      return;
+
+    // First, process all JSON files
+    for (const file of files) {
+      const fileType = this.getFileType(file);
+      if (fileType === 'json') {
+        await this.processIndividualJsonFile(file);
+      }
     }
 
-    files.forEach(file => {
+    // Then, process all files and match them
+    for (const file of files) {
       const uploadFile: UploadFile = {
         file: file,
-        type: this.getFileType(file)
+        type: this.getFileType(file),
+        status: 'pending',
+        progress: 0
       };
       
       // Try to find corresponding JSON file
@@ -313,14 +332,43 @@ export class BulkUpload {
         if (correspondingJson) {
           uploadFile.id_sequence = videoName;
           uploadFile.correspondingJson = correspondingJson.content;
+          console.log('🔗 Found corresponding JSON for video:', videoName);
+        } else {
+          console.log('⚠️ No corresponding JSON found for video:', videoName);
         }
       }
       
       this.uploadedFiles.push(uploadFile);
-    });
+    }
     
     this.uploadSuccess = true;
     this.uploadError = null;
+  }
+
+  private processIndividualJsonFile(file: File): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const content = e.target?.result as string;
+          const jsonData = JSON.parse(content);
+          
+          // Add to processedJsonFiles
+          this.processedJsonFiles.push({
+            filename: file.name,
+            content: content
+          });
+          
+          console.log('📝 Processed individual JSON file:', file.name);
+          resolve();
+        } catch (error) {
+          console.error('❌ Error processing JSON file:', file.name, error);
+          reject(error);
+        }
+      };
+      reader.onerror = () => reject(new Error('Failed to read file'));
+      reader.readAsText(file);
+    });
   }
 
   private getFileType(file: File): 'video' | 'json' {
@@ -336,52 +384,162 @@ export class BulkUpload {
     this.uploadedFiles.splice(index, 1);
   }
 
-  // Bulk Upload Processing
+  // Queue-based Bulk Upload Processing
   processBulkUpload() {
     if (this.uploadedFiles.length === 0) {
       this.processingError = 'Aucun fichier sélectionné pour l\'upload en lot.';
       return;
     }
 
-    if (this.uploadedFiles.length > this.MAX_FILES) {
-      this.processingError = `Limite de ${this.MAX_FILES} fichiers dépassée. Veuillez supprimer des fichiers.`;
-      return;
-    }
-
+    // Reset queue state
+    this.isQueueProcessing = true;
     this.isProcessing = true;
     this.processingError = null;
     this.processingSuccess = false;
     this.processingResult = null;
+    this.queueProgress = 0;
+    this.processedCount = 0;
+    this.successCount = 0;
+    this.errorCount = 0;
+    this.currentProcessingIndex = -1;
 
-    // Prepare files and annotations for upload
-    const files = this.uploadedFiles.map(uploadFile => uploadFile.file);
-    const annotations = this.uploadedFiles
-      .filter(uploadFile => uploadFile.correspondingJson)
-      .map(uploadFile => JSON.parse(uploadFile.correspondingJson!));
+    // Reset all file statuses to pending
+    this.uploadedFiles.forEach(file => {
+      file.status = 'pending';
+      file.error = undefined;
+      file.progress = 0;
+    });
 
-    // Call the backend service
-    this.bulkUploadService.bulkUpload(files, annotations).subscribe({
-      next: (result) => {
-        this.isProcessing = false;
-        this.processingSuccess = true;
-        this.processingResult = result;
-        // Bulk upload completed
-      },
-      error: (error) => {
-        this.isProcessing = false;
-        // Bulk upload error
-        
-        if (error.status === 401) {
-          this.processingError = 'Session expirée. Veuillez vous reconnecter.';
-        } else if (error.status === 400) {
-          this.processingError = error.error?.message || 'Erreur de validation des fichiers.';
-        } else if (error.status === 0) {
-          this.processingError = 'Impossible de se connecter au serveur. Vérifiez votre connexion.';
-        } else {
-          this.processingError = error.error?.message || 'Erreur lors de l\'upload en lot.';
+    // Start processing the queue
+    this.processNextFile();
+  }
+
+  private processNextFile() {
+    const pendingFiles = this.uploadedFiles.filter(file => file.status === 'pending');
+    
+    if (pendingFiles.length === 0) {
+      // All files processed
+      this.isQueueProcessing = false;
+      this.isProcessing = false;
+      this.processingSuccess = true;
+      this.updateQueueProgress();
+      return;
+    }
+
+    const nextFile = pendingFiles[0];
+    const fileIndex = this.uploadedFiles.indexOf(nextFile);
+    this.currentProcessingIndex = fileIndex;
+    
+    // Mark file as processing
+    nextFile.status = 'processing';
+    nextFile.progress = 0;
+    
+    // Simulate progress updates
+    const progressInterval = setInterval(() => {
+      if (nextFile.progress && nextFile.progress < 90) {
+        nextFile.progress += Math.random() * 10;
+      }
+    }, 200);
+
+    // Process this file
+    this.processSingleFile(nextFile, fileIndex).then(() => {
+      clearInterval(progressInterval);
+      nextFile.progress = 100;
+      this.processedCount++;
+      this.updateQueueProgress();
+      
+      // Process next file after a short delay
+      setTimeout(() => {
+        this.processNextFile();
+      }, 500);
+    }).catch((error) => {
+      clearInterval(progressInterval);
+      nextFile.status = 'error';
+      nextFile.error = error;
+      nextFile.progress = 0;
+      this.errorCount++;
+      this.updateQueueProgress();
+      
+      // Continue with next file even if this one failed
+      setTimeout(() => {
+        this.processNextFile();
+      }, 500);
+    });
+  }
+
+  private async processSingleFile(uploadFile: UploadFile, fileIndex: number): Promise<void> {
+    return new Promise((resolve, reject) => {
+      try {
+        // Only process video files, skip JSON files
+        if (uploadFile.type !== 'video') {
+          console.log('⏭️ Skipping non-video file:', uploadFile.file.name);
+          uploadFile.status = 'success';
+          this.successCount++;
+          resolve();
+          return;
         }
+
+        // Prepare annotation data for this file
+        const annotation = uploadFile.correspondingJson ? JSON.parse(uploadFile.correspondingJson) : null;
+
+        // Call the backend service for this single file
+        this.bulkUploadService.uploadSingleFile(uploadFile.file, annotation).subscribe({
+          next: (result) => {
+            console.log('🔍 Single file upload result for file:', uploadFile.file.name, result);
+            
+            // Check if there are any errors in the result
+            if (result.errors && result.errors.length > 0) {
+              // If there are errors, treat this as a failure
+              const errorMessages = result.errors.map(err => err.error).join(', ');
+              console.log('❌ Errors found in result:', errorMessages);
+              reject(errorMessages);
+            } else if (result.videos && result.videos.length === 0) {
+              // If no videos were uploaded, treat as failure
+              console.log('❌ No videos uploaded');
+              reject('Aucune vidéo n\'a été uploadée');
+            } else {
+              // Success - at least one video was uploaded
+              console.log('✅ File processed successfully');
+              uploadFile.status = 'success';
+              this.successCount++;
+              resolve();
+            }
+          },
+          error: (error) => {
+            console.log('❌ Error response for file:', uploadFile.file.name, error);
+            let errorMessage = 'Erreur inconnue';
+            
+            if (error.status === 401) {
+              errorMessage = 'Session expirée. Veuillez vous reconnecter.';
+            } else if (error.status === 400) {
+              // Handle 400 errors (like duplicate filename)
+              if (error.error?.message) {
+                errorMessage = error.error.message;
+              } else if (error.error?.data?.errors && error.error.data.errors.length > 0) {
+                // Handle errors from bulk upload response
+                errorMessage = error.error.data.errors.map((err: any) => err.error).join(', ');
+              } else {
+                errorMessage = 'Erreur de validation du fichier.';
+              }
+            } else if (error.status === 0) {
+              errorMessage = 'Impossible de se connecter au serveur.';
+            } else {
+              errorMessage = error.error?.message || 'Erreur lors de l\'upload du fichier.';
+            }
+            
+            console.log('❌ Final error message:', errorMessage);
+            reject(errorMessage);
+          }
+        });
+      } catch (error) {
+        reject('Erreur lors de la préparation du fichier: ' + error);
       }
     });
+  }
+
+  private updateQueueProgress() {
+    const totalFiles = this.uploadedFiles.length;
+    this.queueProgress = totalFiles > 0 ? (this.processedCount / totalFiles) * 100 : 0;
   }
 
   clearAll() {
@@ -394,5 +552,13 @@ export class BulkUpload {
     this.jsonProcessingError = null;
     this.jsonProcessingSuccess = false;
     this.processingResult = null;
+    
+    // Reset queue state
+    this.isQueueProcessing = false;
+    this.queueProgress = 0;
+    this.processedCount = 0;
+    this.successCount = 0;
+    this.errorCount = 0;
+    this.currentProcessingIndex = -1;
   }
 } 

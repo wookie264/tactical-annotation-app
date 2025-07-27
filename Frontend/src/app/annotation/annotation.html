@@ -19,7 +19,7 @@
   <!-- Annotations list -->
   <div *ngFor="let ann of filteredAnnotations" class="annotation-card">
     <div class="annotation-content">
-      <div *ngIf="ann.videoFile" class="annotation-video">
+      <div *ngIf="ann.video" class="annotation-video">
         <div class="video-wrapper"
              (mouseenter)="hoveredVideo = ann"
              (mouseleave)="hoveredVideo = null">
@@ -31,6 +31,8 @@
             loop
             width="100%"
             style="width:100%;height:auto;max-width:100%;object-fit:cover;"
+            (error)="onVideoError($event, ann)"
+            (loadeddata)="onVideoLoaded(ann)"
             #videoPlayer>
             Votre navigateur ne supporte pas la lecture de vidéos.
           </video>

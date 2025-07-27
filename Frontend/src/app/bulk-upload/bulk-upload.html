@@ -136,9 +136,8 @@
               <input type="file" multiple accept="video/*,.json" class="hidden-input" (change)="onFileSelected($event)">
             </label>
             <p class="file-types">Vidéos (MP4, AVI, MOV, WMV, FLV) et fichiers JSON</p>
-            <p class="file-limit" [class.limit-reached]="uploadedFiles.length >= MAX_FILES">
-              Limite: {{ uploadedFiles.length }}/{{ MAX_FILES }} fichiers
-              <span *ngIf="uploadedFiles.length >= MAX_FILES" class="limit-warning">⚠️ Limite atteinte</span>
+            <p class="file-count">
+              {{ uploadedFiles.length }} fichier(s) sélectionné(s)
             </p>
           </div>
         </div>
@@ -146,12 +145,12 @@
         <!-- Uploaded Files List -->
         <div *ngIf="uploadedFiles.length > 0" class="uploaded-files">
           <div class="files-header">
-            <h3>Fichiers sélectionnés ({{ uploadedFiles.length }}/{{ MAX_FILES }})</h3>
+            <h3>Fichiers sélectionnés ({{ uploadedFiles.length }})</h3>
             <button class="btn btn-secondary" (click)="clearAll()">Tout effacer</button>
           </div>
           
           <div class="files-list">
-            <div *ngFor="let uploadFile of uploadedFiles; let i = index" class="file-item">
+            <div *ngFor="let uploadFile of uploadedFiles; let i = index" class="file-item" [class.processing]="uploadFile.status === 'processing'" [class.success]="uploadFile.status === 'success'" [class.error]="uploadFile.status === 'error'">
               <div class="file-info">
                 <div class="file-icon">
                   <svg *ngIf="uploadFile.type === 'video'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
@@ -171,9 +170,29 @@
                   <span class="file-name">{{ uploadFile.file.name }}</span>
                   <span class="file-type">{{ uploadFile.type === 'video' ? 'Vidéo' : 'JSON' }}</span>
                   <span *ngIf="uploadFile.id_sequence" class="file-match">✓ Correspondance trouvée</span>
+                  
+                  <!-- File Status -->
+                  <div class="file-status">
+                    <span *ngIf="uploadFile.status === 'pending'" class="status pending">⏳ En attente</span>
+                    <span *ngIf="uploadFile.status === 'processing'" class="status processing">🔄 Traitement...</span>
+                    <span *ngIf="uploadFile.status === 'success' && uploadFile.type === 'video'" class="status success">✅ Succès</span>
+                    <span *ngIf="uploadFile.status === 'success' && uploadFile.type === 'json'" class="status skipped">⏭️ Traité avec vidéo</span>
+                    <span *ngIf="uploadFile.status === 'error'" class="status error">❌ Erreur</span>
+                  </div>
+                  
+                  <!-- Error Message -->
+                  <div *ngIf="uploadFile.status === 'error' && uploadFile.error" class="error-message">
+                    {{ uploadFile.error }}
+                  </div>
+                  
+                  <!-- Progress Bar -->
+                  <div *ngIf="uploadFile.status === 'processing' && uploadFile.progress !== undefined" class="progress-bar">
+                    <div class="progress-fill" [style.width.%]="uploadFile.progress"></div>
+                    <span class="progress-text">{{ Math.round(uploadFile.progress) }}%</span>
+                  </div>
                 </div>
               </div>
-              <button class="remove-btn" (click)="removeFile(i)">
+              <button class="remove-btn" (click)="removeFile(i)" [disabled]="uploadFile.status === 'processing'">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
                   <line x1="18" y1="6" x2="6" y2="18"/>
                   <line x1="6" y1="6" x2="18" y2="18"/>
@@ -211,13 +230,33 @@
           </button>
         </div>
 
+        <!-- Queue Progress -->
+        <div *ngIf="isQueueProcessing" class="queue-progress">
+          <div class="progress-header">
+            <h4>Progression de la file d'attente</h4>
+            <span class="progress-stats">{{ processedCount }}/{{ uploadedFiles.length }} fichiers traités</span>
+          </div>
+          
+          <div class="progress-bar-container">
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="queueProgress"></div>
+            </div>
+            <span class="progress-text">{{ Math.round(queueProgress) }}%</span>
+          </div>
+          
+          <div class="queue-stats">
+            <span class="stat success">✅ {{ successCount }} succès</span>
+            <span class="stat error">❌ {{ errorCount }} erreurs</span>
+          </div>
+        </div>
+
         <!-- Processing Status -->
         <div *ngIf="processingError" class="status-message error">
           <p>{{ processingError }}</p>
         </div>
         
         <div *ngIf="processingSuccess" class="status-message success">
-          <p>Upload en lot traité avec succès!</p>
+          <p>Upload en lot terminé! {{ successCount }} fichiers traités avec succès, {{ errorCount }} erreurs.</p>
           
           <!-- Processing Results -->
           <div *ngIf="processingResult" class="processing-results">

@@ -3,8 +3,9 @@ import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AnnotationModule } from './annotation/annotation.module';
-import { VideoModule } from './video/video.module';
+import { ManualAnnotationModule } from './manual-annotation/manual-annotation.module';
+import { ManualVideoModule } from './video/manual-video.module';
+import { AIVideoModule } from './video/ai-video.module';
 import { PrismaService } from './prisma/prisma.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { RapportModule } from './rapport/rapport.module';
@@ -14,12 +15,13 @@ import { AIAnnotationModule } from './ai-annotation/ai-annotation.module';
 import { EmailModule } from './email/email.module';
 
 @Module({
-  imports: [
+    imports: [
     HttpModule,
-    AnnotationModule, 
-    PrismaModule, 
-    VideoModule, 
-    RapportModule, 
+    ManualAnnotationModule,
+    PrismaModule,
+    ManualVideoModule,
+    AIVideoModule,
+    RapportModule,
     AuthModule,
     UserModule,
     AIAnnotationModule,

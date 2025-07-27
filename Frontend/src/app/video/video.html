@@ -49,7 +49,7 @@
   
   <div *ngIf="uploadSuccess && uploadedVideo" class="upload-status success">
     <p>Vidéo uploadée avec succès!</p>
-    <p *ngIf="uploadedVideo.fileName">Fichier: {{ uploadedVideo.fileName }}</p>
+    <p *ngIf="uploadedVideo.filename">Fichier: {{ uploadedVideo.filename }}</p>
   </div>
 
   <!-- Video Preview Section -->
@@ -106,5 +106,11 @@
     </span>
   </label>
 <div class="predict-container">
-  <button id="predictBtn" class="predict-btn">Predict</button>
+        <button id="predictBtn" class="predict-btn" (click)="triggerPrediction()" [disabled]="!uploadedVideo">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" style="margin-right: 8px;">
+          <rect x="2" y="7" width="15" height="10" rx="2" ry="2"/>
+          <polygon points="23 7 16 12 23 17 23 7"/>
+        </svg>
+        Analyser IA (Rapport)
+      </button>
 </div></div>

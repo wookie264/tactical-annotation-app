@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Output, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { VideoService, Video } from '../services/video.service';
+import { ManualVideoService, Video } from '../services/manual-video.service';
 
 @Component({
   selector: 'app-video-upload',
@@ -19,7 +19,7 @@ export class VideoUpload implements OnDestroy {
 
   @Output() videoUploaded = new EventEmitter<Video>();
 
-  constructor(private videoService: VideoService) {}
+  constructor(private manualVideoService: ManualVideoService) {}
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -42,7 +42,7 @@ export class VideoUpload implements OnDestroy {
   }
 
   private checkForDuplicate(filename: string) {
-    this.videoService.checkVideoExists(filename).subscribe({
+    this.manualVideoService.getAllVideos().subscribe({
       next: (response) => {
         const videos = response.data || [];
         const existingVideo = videos.find((video: any) => video.filename === filename);
@@ -70,7 +70,7 @@ export class VideoUpload implements OnDestroy {
 
           // Uploading file
 
-    this.videoService.uploadVideo(this.selectedFile).subscribe({
+    this.manualVideoService.uploadVideo(this.selectedFile).subscribe({
       next: (response) => {
         this.isUploading = false;
         this.uploadSuccess = true;
@@ -124,7 +124,7 @@ export class VideoUpload implements OnDestroy {
   // Get the id_sequence from the uploaded video filename
   getIdSequence(): string | null {
     if (this.uploadedVideo?.filename) {
-      return this.videoService.generateIdSequence(this.uploadedVideo.filename);
+      return this.manualVideoService.generateIdSequence(this.uploadedVideo.filename);
     }
     return null;
   }

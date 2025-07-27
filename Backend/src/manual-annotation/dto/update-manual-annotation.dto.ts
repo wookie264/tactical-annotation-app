@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { IsOptional, IsString } from "class-validator"
 
-export class UpdateAnnotationDto {
+export class UpdateManualAnnotationDto {
   @IsOptional()
   @IsString()
   annotation?: string;

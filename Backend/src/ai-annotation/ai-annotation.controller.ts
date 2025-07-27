@@ -25,4 +25,9 @@ export class AIAnnotationController {
   ) {
     return await this.aiAnnotationService.updateRapportValidation(rapportId, body.validation);
   }
+
+  @Post('analyze-annotation/:annotationId')
+  async analyzeExistingAnnotation(@Param('annotationId') annotationId: string) {
+    return await this.aiAnnotationService.analyzeExistingAnnotation(annotationId);
+  }
 } 

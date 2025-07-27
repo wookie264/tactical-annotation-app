@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService, User } from '../services/auth.service';
 import { CommonModule } from '@angular/common';
@@ -11,7 +11,7 @@ import { Rapport } from '../rapport/rapport';
   templateUrl: './history.html',
   styleUrl: './history.css'
 })
-export class History {
+export class History implements OnInit {
   currentUser: User | null = null;
   goBackEvent: any;
    constructor(
@@ -27,11 +27,11 @@ export class History {
 
 
  goToManualHistory() {
-    this.router.navigate(['/history/manual']);
+    this.selectHistory('manual');
   }
 
   goToIAHistory() {
-    this.router.navigate(['/history/ia']);
+    this.selectHistory('ia');
   }
  
   goBack() {
@@ -39,6 +39,11 @@ export class History {
   }
 
  selectedHistory: 'manual' | 'ia' | null = null;
+
+ngOnInit() {
+  // Set default selection to manual annotations
+  this.selectedHistory = 'manual';
+}
 
 selectHistory(type: 'manual' | 'ia') {
   this.selectedHistory = type;

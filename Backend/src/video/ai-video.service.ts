@@ -2,7 +2,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateVideoDto, UpdateVideoDto } from './dto/video.dto';
-import { AnnotationService } from '../annotation/annotation.service';
 import * as fs from 'fs';
 import * as path from 'path';
 import { exec } from 'child_process';
@@ -11,10 +10,9 @@ import { promisify } from 'util';
 const execAsync = promisify(exec);
 
 @Injectable()
-export class VideoService {
+export class AIVideoService {
   constructor(
-    private prisma: PrismaService,
-    private annotationService: AnnotationService
+    private prisma: PrismaService
   ) {}
 
   async getAllVideos() {
@@ -113,78 +111,6 @@ export class VideoService {
     return await this.createVideo(videoData);
   }
 
-  async bulkUpload(files: { mimetype: string; size: number; originalname: string; buffer: Buffer }[], annotations: any) {
-    const results: {
-      videos: any[];
-      annotations: any[];
-      errors: Array<{ file?: string; annotation?: string; error: string }>;
-    } = {
-      videos: [],
-      annotations: [],
-      errors: []
-    };
-
-    // Separate videos and JSON files
-    const videoFiles = files.filter(file => 
-      file.mimetype.startsWith('video/') || 
-      file.originalname.match(/\.(mp4|avi|mov|wmv|flv)$/i)
-    );
-
-    // Process videos first and store them with their filenames
-    const uploadedVideos = new Map<string, any>();
-    
-    for (const videoFile of videoFiles) {
-      try {
-        const video = await this.uploadVideo(videoFile);
-        results.videos.push(video);
-        
-        // Store video by filename (without extension) for annotation matching
-        const videoName = videoFile.originalname.replace(/\.[^/.]+$/, '');
-        uploadedVideos.set(videoName, video);
-      } catch (error) {
-        results.errors.push({
-          file: videoFile.originalname,
-          error: error instanceof Error ? error.message : 'Unknown error'
-        });
-      }
-    }
-
-    // Process annotations if provided
-    if (annotations && Array.isArray(annotations)) {
-      for (const annotation of annotations) {
-        try {
-          // Find the corresponding video for this annotation
-          const videoName = annotation.id_sequence;
-          const correspondingVideo = uploadedVideos.get(videoName);
-          
-          if (!correspondingVideo) {
-            results.errors.push({
-              annotation: annotation.id_sequence || 'unknown',
-              error: `No corresponding video found for annotation ${annotation.id_sequence}`
-            });
-            continue;
-          }
-
-          // Add the videoId to the annotation
-          const annotationWithVideoId = {
-            ...annotation,
-            videoId: correspondingVideo.id,
-            domicile: annotation.domicile || null,
-            visiteuse: annotation.visiteuse || null
-          };
-
-          // Create annotation using the annotation service
-          const createdAnnotation = await this.annotationService.createAnnotation(annotationWithVideoId);
-          results.annotations.push(createdAnnotation);
-        } catch (error) {
-          results.errors.push({
-            annotation: annotation.id_sequence || 'unknown',
-            error: error instanceof Error ? error.message : 'Unknown error'
-          });
-        }
-      }
-    }
-
-    return results;
-  }
-}
+  // AI Video Service doesn't have bulk upload - only single video processing
+  // This service is specifically for AI analysis workflow
+} 

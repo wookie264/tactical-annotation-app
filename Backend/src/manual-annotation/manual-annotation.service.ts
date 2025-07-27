@@ -1,34 +1,42 @@
 /* eslint-disable prettier/prettier */
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AnnotationDto } from './dto/annotation.dto';
-import { UpdateAnnotationDto } from './dto/update-annotation.dto';
+import { ManualAnnotationDto } from './dto/manual-annotation.dto';
+import { UpdateManualAnnotationDto } from './dto/update-manual-annotation.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import * as fs from 'fs';
 
 
 @Injectable()
-export class AnnotationService {
+export class ManualAnnotationService {
     constructor(private prisma:PrismaService) {}
 
     async getAnnotation(){
-        return await this.prisma.annotation.findMany();
+        return await this.prisma.annotation.findMany({
+            include: {
+                video: true
+            }
+        });
     }
 
-    async createAnnotation(annotation: AnnotationDto){
+    async createAnnotation(annotation: ManualAnnotationDto){
         try {
-            return await this.prisma.annotation.create({data:annotation,})
+            console.log('📝 Creating annotation with data:', annotation);
+            const result = await this.prisma.annotation.create({data:annotation,})
+            console.log('✅ Annotation created successfully:', result.id_sequence);
+            return result;
         } catch (error) {
+            console.error('❌ Error creating annotation:', error);
             if (error instanceof PrismaClientKnownRequestError) {
                 if (error.code === 'P2002') {
                     throw new BadRequestException(`Annotation with id_sequence '${annotation.id_sequence}' already exists`);
                 }
             }
-            throw new BadRequestException('Failed to create annotation');
+            throw new BadRequestException(`Failed to create annotation: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     }
 
-    async getAnnotationById(id_sequence: AnnotationDto['id_sequence']){
+    async getAnnotationById(id_sequence: ManualAnnotationDto['id_sequence']){
         return await  this.prisma.annotation.findUnique({
             where: {
                 id_sequence:id_sequence,
@@ -37,7 +45,7 @@ export class AnnotationService {
     }
     
 
-    async deleteAnnotation(id_sequence:AnnotationDto['id_sequence']){
+    async deleteAnnotation(id_sequence:ManualAnnotationDto['id_sequence']){
         try {
             // First, get the annotation to find the associated video
             const annotation = await this.prisma.annotation.findUnique({
@@ -108,7 +116,7 @@ export class AnnotationService {
         }
     }
 
-    async updateAnnotation(id_sequence:AnnotationDto['id_sequence'], annotation:UpdateAnnotationDto){
+    async updateAnnotation(id_sequence:ManualAnnotationDto['id_sequence'], annotation:UpdateManualAnnotationDto){
         // Filter out undefined values
         const updateData = Object.fromEntries(
             Object.entries(annotation).filter(([, value]) => value !== undefined)

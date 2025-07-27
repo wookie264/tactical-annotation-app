@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { VideoUpload } from '../video-upload/video-upload';
 import { TacticalAnnotationForm } from '../tactical-annotation-form/tactical-annotation-form';
 import { BulkUpload } from '../bulk-upload/bulk-upload';
-import { Video } from '../services/video.service';
+import { Video } from '../services/manual-video.service';
 import { AuthService, User } from '../services/auth.service';
 import { Router } from '@angular/router';
 

@@ -1,8 +1,8 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { AnnotationService, CreateAnnotationDto } from '../services/annotation.service';
-import { Video } from '../services/video.service';
+import { ManualAnnotationService, CreateAnnotationDto } from '../services/manual-annotation.service';
+import { Video } from '../services/manual-video.service';
 import { AuthService, User } from '../services/auth.service';
 
 @Component({
@@ -29,7 +29,7 @@ export class TacticalAnnotationForm {
   submitSuccess = false;
   currentUser: User | null = null;
 
-  constructor(private annotationService: AnnotationService, private authService: AuthService) {
+  constructor(private manualAnnotationService: ManualAnnotationService, private authService: AuthService) {
     this.currentUser = this.authService.getCurrentUser();
     if (this.currentUser) {
       this.formData.entraineur = this.currentUser.username;
@@ -119,7 +119,7 @@ export class TacticalAnnotationForm {
     this.isSubmitting = true;
 
     // First, validate that the video exists on the backend
-    this.annotationService.validateVideoExists(this.uploadedVideo!.id).subscribe({
+    this.manualAnnotationService.validateVideoExists(this.uploadedVideo!.id).subscribe({
       next: (videoResponse) => {
         // Video exists, proceed with annotation creation
         this.createAnnotation();
@@ -157,7 +157,7 @@ export class TacticalAnnotationForm {
       videoId: this.uploadedVideo!.id
     };
 
-    this.annotationService.createAnnotation(annotationData).subscribe({
+    this.manualAnnotationService.createAnnotation(annotationData).subscribe({
       next: (response) => {
         this.isSubmitting = false;
         this.submitSuccess = true;

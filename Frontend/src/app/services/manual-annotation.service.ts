@@ -27,8 +27,8 @@ export interface Annotation {
 @Injectable({
   providedIn: 'root'
 })
-export class AnnotationService {
-  private apiUrl = 'http://localhost:3000/annotation'; // Adjust port as needed
+export class ManualAnnotationService {
+  private apiUrl = 'http://localhost:3000/manual-annotation'; // Adjust port as needed
   private videoApiUrl = 'http://localhost:3000/video'; // Video API URL
 
   constructor(private http: HttpClient) {}
